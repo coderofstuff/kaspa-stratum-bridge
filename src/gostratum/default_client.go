@@ -132,7 +132,7 @@ func SendExtranonce(ctx *StratumContext) {
 	if bitmainRegex.MatchString(ctx.RemoteApp) {
 		err = ctx.Send(NewEvent("", "mining.set_extranonce", []any{ctx.Extranonce, 8 - (len(ctx.Extranonce) / 2)}))
 	} else {
-		err = ctx.Send(NewEvent("", "set_extranonce", []any{ctx.Extranonce}))
+		err = ctx.Send(NewEvent("", "mining.set_extranonce", []any{ctx.Extranonce}))
 	}
 	if err != nil {
 		// should we doing anything further on failure
