@@ -325,8 +325,9 @@ func (sh *shareHandler) startPruneStatsThread() error {
 
 		sh.statsLock.Lock()
 		for k, v := range sh.stats {
-			// delete client stats if no shares for 10m
-			if time.Since(v.LastShare).Seconds() > 600 {
+			// delete client stats if no shares since connect after 3m, or if
+			// last share was > 10m ago
+			if (v.SharesFound.Load() == 0 && time.Since(v.LastShare).Seconds() > 180) || time.Since(v.LastShare).Seconds() > 600 {
 				delete(sh.stats, k)
 				continue
 			}
@@ -346,7 +347,7 @@ func (sh *shareHandler) startPrintStatsThread() error {
 		// sh.statsLock.Lock()
 
 		str := "\n===============================================================================\n"
-		str += "  worker name   |  avg hashrate  |   acc/stl/inv  |    blocks    |    uptime   \n"
+		str += "      worker name      |  avg hashrate  |  acc/stl/inv  | blocks |    uptime   \n"
 		str += "-------------------------------------------------------------------------------\n"
 		var lines []string
 		totalRate := float64(0)
@@ -356,7 +357,7 @@ func (sh *shareHandler) startPrintStatsThread() error {
 			totalRate += rate
 			rateStr := stringifyHashrate(rate)
 			ratioStr := fmt.Sprintf("%d/%d/%d", v.SharesFound.Load(), v.StaleShares.Load(), v.InvalidShares.Load())
-			lines = append(lines, fmt.Sprintf(" %-15s| %14.14s | %14.14s | %12d | %11s",
+			lines = append(lines, fmt.Sprintf(" %-22s| %14.14s | %13.13s | %6d | %11s",
 				v.WorkerName, rateStr, ratioStr, v.BlocksFound.Load(), time.Since(v.StartTime).Round(time.Second)))
 		}
 		sort.Strings(lines)
@@ -364,7 +365,7 @@ func (sh *shareHandler) startPrintStatsThread() error {
 		rateStr := stringifyHashrate(totalRate)
 		ratioStr := fmt.Sprintf("%d/%d/%d", sh.overall.SharesFound.Load(), sh.overall.StaleShares.Load(), sh.overall.InvalidShares.Load())
 		str += "\n-------------------------------------------------------------------------------\n"
-		str += fmt.Sprintf("                | %14.14s | %14.14s | %12d | %11s",
+		str += fmt.Sprintf("                       | %14.14s | %13.13s | %6d | %11s",
 			rateStr, ratioStr, sh.overall.BlocksFound.Load(), time.Since(start).Round(time.Second))
 		str += "\n========================================================== ks_bridge_" + version + " ===\n"
 		// sh.statsLock.Unlock()
