@@ -319,7 +319,23 @@ func (sh *shareHandler) submit(ctx *gostratum.StratumContext,
 	return nil
 }
 
-func (sh *shareHandler) startStatsThread() error {
+func (sh *shareHandler) startPruneStatsThread() error {
+	for {
+		time.Sleep(60 * time.Second)
+
+		sh.statsLock.Lock()
+		for k, v := range sh.stats {
+			// delete client stats if no shares for 10m
+			if time.Since(v.LastShare).Seconds() > 600 {
+				delete(sh.stats, k)
+				continue
+			}
+		}
+		sh.statsLock.Unlock()
+	}
+}
+
+func (sh *shareHandler) startPrintStatsThread() error {
 	start := time.Now()
 	for {
 		// console formatting is terrible. Good luck whever touches anything
