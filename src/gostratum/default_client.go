@@ -140,7 +140,7 @@ func SendExtranonce(ctx *StratumContext) {
 	}
 }
 
-var walletRegex = regexp.MustCompile("kaspa:[a-z0-9]+")
+var walletRegex = regexp.MustCompile("kaspa:([a-z0-9]{61}|[a-z0-9]{63})")
 
 func CleanWallet(in string) (string, error) {
 	_, err := util.DecodeAddress(in, util.Bech32PrefixKaspa)
@@ -152,8 +152,9 @@ func CleanWallet(in string) (string, error) {
 	}
 
 	// has kaspa: prefix but other weirdness somewhere
-	if walletRegex.MatchString(in) {
-		return in[0:67], nil
+	var match = walletRegex.FindString(in)
+	if len(match) > 0 {
+		return match, nil
 	}
 	return "", errors.New("unable to coerce wallet to valid kaspa address")
 }

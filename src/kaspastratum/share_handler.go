@@ -342,9 +342,9 @@ func (sh *shareHandler) startPrintStatsThread() error {
 		// console formatting is terrible. Good luck whever touches anything
 		time.Sleep(10 * time.Second)
 
-		// don't like locking entire stats struct - risk should be negligible
+		// TODO: don't like locking entire stats struct
 		// if mutex is ultimately needed, should move to one per client
-		// sh.statsLock.Lock()
+		sh.statsLock.Lock()
 
 		str := "\n===============================================================================\n"
 		str += "      worker name      |  avg hashrate  |  acc/stl/inv  | blocks |    uptime   \n"
@@ -368,7 +368,7 @@ func (sh *shareHandler) startPrintStatsThread() error {
 		str += fmt.Sprintf("                       | %14.14s | %13.13s | %6d | %11s",
 			rateStr, ratioStr, sh.overall.BlocksFound.Load(), time.Since(start).Round(time.Second))
 		str += "\n========================================================== ks_bridge_" + version + " ===\n"
-		// sh.statsLock.Unlock()
+		sh.statsLock.Unlock()
 		log.Println(str)
 	}
 }
@@ -416,9 +416,9 @@ func (sh *shareHandler) startVardiffThread(expectedShareRate uint, logStats bool
 	for {
 		time.Sleep(varDiffThreadSleep * time.Second)
 
-		// don't like locking entire stats struct - risk should be negligible
+		// TODO: don't like locking entire stats struct
 		// if mutex is ultimately needed, should move to one per client
-		// sh.statsLock.Lock()
+		sh.statsLock.Lock()
 
 		stats := "\n=== vardiff ===================================================================\n\n"
 		stats += "  worker name  |    diff     |  window  |  elapsed   |    shares   |   rate    \n"
@@ -500,7 +500,7 @@ func (sh *shareHandler) startVardiffThread(expectedShareRate uint, logStats bool
 			bws.Write([]byte(stats))
 		}
 
-		// sh.statsLock.Unlock()
+		sh.statsLock.Unlock()
 	}
 }
 
