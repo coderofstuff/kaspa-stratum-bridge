@@ -26,7 +26,7 @@ jobs:
         OUTFILE="ks_bridge"
         OUTDIR="ks_bridge"
 
-        mkdir -p ${OUTDIR};env GOOS=windows GOARCH=amd64 go build -o ${OUTDIR}/${OUTFILE}.exe ${CMD_PATH};cp ${CMD_PATH}/config.yaml ${OUTDIR}/
+        mkdir -p ${OUTDIR};env GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o ${OUTDIR}/${OUTFILE}.exe ${CMD_PATH};cp ${CMD_PATH}/config.yaml ${OUTDIR}/
         zip -r ${ARCHIVE}.zip ${OUTDIR}
         rm -rf ${OUTDIR}
 
