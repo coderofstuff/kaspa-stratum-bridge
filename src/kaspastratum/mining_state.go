@@ -9,7 +9,7 @@ import (
 	"github.com/onemorebsmith/kaspastratum/src/gostratum"
 )
 
-const maxjobs = 32
+const maxjobs = 300
 
 type MiningState struct {
 	Jobs        map[uint64]*appmessage.RPCBlock
@@ -20,7 +20,7 @@ type MiningState struct {
 	useBigJob   bool
 	connectTime time.Time
 	stratumDiff *kaspaDiff
-	maxJobs     uint8
+	maxJobs     uint16
 }
 
 func MiningStateGenerator() any {
