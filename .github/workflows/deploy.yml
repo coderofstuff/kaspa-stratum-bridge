@@ -34,7 +34,7 @@ jobs:
         echo "asset_name_win=${ARCHIVE}.zip" >> $GITHUB_ENV
         
         # linux
-        mkdir -p ${OUTDIR};env GOOS=linux GOARCH=amd64 go build -o ${OUTDIR}/${OUTFILE} ${CMD_PATH};cp ${CMD_PATH}/config.yaml ${OUTDIR}/
+        mkdir -p ${OUTDIR};env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ${OUTDIR}/${OUTFILE} ${CMD_PATH};cp ${CMD_PATH}/config.yaml ${OUTDIR}/
         tar -czvf ${ARCHIVE}.tar.gz ${OUTDIR}
 
         echo "archive_name_linux=${ARCHIVE}.tar.gz" >> $GITHUB_ENV
